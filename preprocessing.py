@@ -86,8 +86,8 @@ def init_tf_idf_lexicon(lexicon):
     tf_idf = dict()
     for keys,values in lexicon.items():
         tf_idf[keys] = {}
-        for leg in range(1,51):
-            tf_idf[keys][leg] = 0
+        for leg in range(0,51):
+            tf_idf[keys][leg] = float(0)
     return tf_idf
 
 def tf_idf_lexicon(lexicon,idf):
@@ -101,7 +101,23 @@ def tf_idf_lexicon(lexicon,idf):
     # print(idf)
     # for 
     # print(tf_idf)
-    
+
+
+def init_v_table():
+    vector_table = dict()
+
+    for i in range(0,51):
+        vector_table[i] = {}
+    return vector_table
+
+def make_vector_table(tf_idf):
+    vector_table = init_v_table()
+
+    for terms, docs in tf_idf.items():
+        for docNo, idf_tf in docs.items():
+            vector_table[docNo][terms] = idf_tf
+
+    return vector_table
 
 
 def preprocessing():
@@ -110,6 +126,7 @@ def preprocessing():
     lexicon = fileRead(lexicon)
     idf = make_idf(lexicon)
     tf_idf = tf_idf_lexicon(lexicon,idf)
+    vector_table = make_vector_table(tf_idf)
     
     with open("lexicon.json", "w") as outfile: 
         json.dump(lexicon, outfile)
@@ -119,6 +136,9 @@ def preprocessing():
 
     with open("tf_idf.json", "w") as outfile: 
         json.dump(tf_idf, outfile)
+    
+    with open("vector_table.json", "w") as outfile: 
+        json.dump(vector_table, outfile)
 
     #cleaner("MATTTieuess!'wwe@@23")
 

@@ -40,3 +40,43 @@
     transform: rotate(360deg);
   }
 }
+
+.Container {
+  padding: 5%;
+  background-color: antiquewhite;
+}
+
+.info {
+  /* size: 30px,30px,30px,30px; */
+  align-content:space-around;
+  padding-left: 40%;
+  padding-right: 40%;
+  padding-top: 3%;
+  padding-bottom: 1%;
+  border-style: none;
+}
+
+.info2 {
+  /* size: 30px,30px,30px,30px; */
+  /* align-content:space-around; */
+  /* padding-left: 40%;
+  padding-right: 40%; */
+  padding-top: 1%;
+  padding-bottom: 3%;
+  border-style: none;
+}
+
+.query {
+  width: 80%;
+  /* align-items: center; */
+  padding-left: 10px;
+  margin-left: 40px;
+
+}
+
+.mylabel {
+  font-size: large;
+  margin-left: 40px;
+  padding: 0px;
+  border-width: 0px;
+}

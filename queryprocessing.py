@@ -1,12 +1,19 @@
 from nltk.stem import PorterStemmer
 from nltk.stem import WordNetLemmatizer
+from pattern3.en import singularize
+import re
 import json
 import math
 
 def cleaner(uncleaned):
     porter = PorterStemmer()
-    # lemma = WordNetLemmatizer()
+    lemma = WordNetLemmatizer()
     uncleaned = uncleaned.lower()
+    uncleaned = singularize(uncleaned)
+    uncleaned = re.sub(r'ly$', r'', uncleaned)
+    uncleaned = re.sub(r'ed$', r'', uncleaned)
+    uncleaned = re.sub(r'ing$', r'', uncleaned)
+    uncleaned = re.sub(r'nes$', r'', uncleaned)
     # print(uncleaned)
     # uncleaned = uncleaned.strip()
     # uncleaned = uncleaned.translate({ord(i): None for i in '!\\@#-_:$%^&*();.,?/1”2’3“4‘567890\'\"'})
@@ -14,18 +21,28 @@ def cleaner(uncleaned):
     #     t = ord(i)
     #     if t < 97 or t>122:
     #         uncleaned = uncleaned.replace(i, "")
-    uncleaned = porter.stem(uncleaned)
     # uncleaned = lemma.lemmatize(uncleaned)
+    # uncleaned = porter.stem(uncleaned)
     # print(uncleaned)
     return uncleaned
 
 def read_query():
     query = str(input())
     # print(query)
+    stop_word = []
+    with open("Stopword-List.txt",'r') as stop:
+        for line in stop:
+            temp = line.strip()
+            stop_word.append(temp)
+
     query = query.split(" ")
     # print(query)
     for i in range(len(query)):
         query[i] = cleaner(query[i])
+
+    for word in query:
+        if word in stop_word:
+            query.remove(word)
     # print(query)
     return query
 
@@ -74,14 +91,14 @@ def my_filter(sim_table,alpha):
     return result
 
 def queryprocessing():
-    with open('lexicon.json') as f:
-        lexicon = json.load(f)
+    # with open('lexicon.json') as f:
+    #     lexicon = json.load(f)
 
     with open('idf.json') as f:
         idf = json.load(f)
 
-    with open('tf_idf.json') as f:
-        tf_idf = json.load(f)
+    # with open('tf_idf.json') as f:
+    #     tf_idf = json.load(f)
 
     with open('vector_table.json') as f:
         vector_table = json.load(f)
@@ -90,18 +107,24 @@ def queryprocessing():
     # print(idf)
     # print(tf_idf)
     # print(vector_table)
+    query =""
 
-    query = read_query()
+    while True:
+        query = read_query()
+        if query[0] == "end":
+            break
 
-    vector_table = insert_query_tf(vector_table,query)
-    vector_table = idf_mul(vector_table,idf)
+        vector_table = insert_query_tf(vector_table,query)
+        vector_table = idf_mul(vector_table,idf)
 
-    sim_table = calculate_sim(vector_table)
+        sim_table = calculate_sim(vector_table)
 
-    alpha = 0.01
+        alpha = 0.0015
 
-    result = my_filter(sim_table, alpha)
-    print(result)
+        result = my_filter(sim_table, alpha)
+        print(result)
+        print(len(result))
+
     # print(sim_table)
     # print(vector_table['0'])
 

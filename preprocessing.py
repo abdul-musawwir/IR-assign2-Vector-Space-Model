@@ -1,6 +1,9 @@
 import collections
 import json
 from nltk.stem import PorterStemmer
+from nltk.stem import WordNetLemmatizer
+from pattern3.en import singularize
+import re
 import math
 
 
@@ -14,6 +17,7 @@ def cleaner2(uncleaned):
 
 def cleaner(uncleaned):
     porter = PorterStemmer()
+    lemma = WordNetLemmatizer()
     uncleaned = uncleaned.lower()
     uncleaned = uncleaned.strip()
     uncleaned = uncleaned.translate({ord(i): None for i in '!\\@#-_:$%^&*();.,?/1”2’3“4‘567890\'\"'})
@@ -21,7 +25,13 @@ def cleaner(uncleaned):
         t = ord(i)
         if t < 97 or t>122:
             uncleaned = uncleaned.replace(i, "")
-    uncleaned = porter.stem(uncleaned)
+    uncleaned = singularize(uncleaned)
+    uncleaned = re.sub(r'ly$', r'', uncleaned)
+    uncleaned = re.sub(r'ed$', r'', uncleaned)
+    uncleaned = re.sub(r'ing$', r'', uncleaned)
+    uncleaned = re.sub(r'nes$', r'', uncleaned)
+    # uncleaned = lemma.lemmatize(uncleaned)
+    # uncleaned = porter.stem(uncleaned)
     return uncleaned
     #print(uncleaned)
     # for character in uncleaned:
@@ -35,6 +45,13 @@ def fileRead(lexicon):
     folder = "./ShortStories/"
     ext = ".txt"
 
+    stop_word = []
+    with open("Stopword-List.txt",'r') as stop:
+        for line in stop:
+            temp = line.strip()
+            stop_word.append(temp)
+    # print(stop_word)
+
     for i in range(1,51):
         curr = str(i)
         #print(folder+curr+ext)
@@ -47,6 +64,8 @@ def fileRead(lexicon):
                     word = word.strip()
                     if(len(word)!=0):
                         data = cleaner(word)
+                        if data in stop_word:
+                            continue
                         # print(data)
                         if data in lexicon:
                             if curr in lexicon[data]:
@@ -66,6 +85,7 @@ def fileRead(lexicon):
     # for keys,values in lexicon.items():
     #     print(keys)
     #     print(values)
+    # lexicon.pop('')
 
     print(len(lexicon))
     # with open("lexicon.json", "w") as outfile: 
